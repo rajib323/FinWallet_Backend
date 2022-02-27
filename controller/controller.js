@@ -42,6 +42,7 @@ exports.signUp=(req,res)=>{
                     if(prof){
                         res.status(200).json({
                             "message":"User Created",
+                            "id":prof._id,
                             "email":prof.email,
                             "full_name":prof.full_name,
                             "balance":prof.balance,
@@ -74,19 +75,20 @@ exports.login=(req,res)=>{
                     res.status(200).json({
                         "message":"Logged In",
                         "email":prof.email,
+                        "id":prof._id,
                         "full_name":prof.full_name,
                         "balance":prof.balance,
                         "profile_img":prof.profile_img
                     });
                 }
                 else{
-                    return res.status(200).json({
+                    return res.status(400).json({
                         "message":"Invalid credentials"
                     });
                 }
             }
-            if(err){
-                return res.status(200).json({
+            if(prof==null){
+                return res.status(400).json({
                     "message":"User does not exist"
                 });
             }
@@ -108,13 +110,14 @@ exports.addCredit=(req,res)=>{
     else{
         User.findById(req.body.userId,(err,usr)=>{
             if(usr){
-                User.findByIdAndUpdate(req.body.userId,{balance:usr.balance-parseInt(req.body.amount)},{returnOriginal:false},(err,usr)=>{
+                User.findByIdAndUpdate(req.body.userId,{balance:usr.balance+parseInt(req.body.amount)},{returnOriginal:false},(err,usr)=>{
                 });
             }
         });
         Transactions.create({
             userId:req.body.userId,
             type:"Credit",
+            description:req.body.desc,
             amount:parseInt(req.body.amount)
         },(err,usr)=>{
             if(usr){
@@ -147,6 +150,7 @@ exports.addDebit=(req,res)=>{
         Transactions.create({
             userId:req.body.userId,
             type:"Debit",
+            description:req.body.desc,
             amount:parseInt(req.body.amount)
         },(err,usr)=>{
             if(usr){
@@ -197,10 +201,16 @@ exports.getAll=(req,res)=>{
         });
     }
     else{
-        Transactions.find({userId:req.body.userId},(err,usr)=>{
-            return res.status(200).json({
-                "data":usr
-            })
+        const date = new Date()
+        var firstday=new Date(date.getFullYear(), date.getMonth(), 1);
+        var lastDay=new Date(date.getFullYear(), date.getMonth()+1, 0);
+        Transactions.find({userId:req.body.userId,createdAt:{$gt:firstday,$lt:lastDay}},(err,usr)=>{
+            User.findById(req.body.userId,(err,user)=>{
+                return res.status(200).json({
+                    "balance":user.balance,
+                    "data":usr
+                })
+            });
         });
     }
 }
@@ -217,5 +227,46 @@ exports.getUsrData=(req,res)=>{
                 "data":usr
             })
         });
+    }
+}
+
+exports.getMonthData=(req,res)=>{
+    if(req.body.id==null||req.body.id==""){
+        return res.status(400).json({
+            "message":"User-Id missing"
+        });
+    }
+    else{
+        Transactions.find({userId:req.body.id},(err,usr)=>{
+            const date=new Date();
+            var body={};
+            var firstmonth=new Date(usr[0].createdAt);
+            const monthNames = ["January", "February", "March", "April", "May", "June","July", "August", "September", "October", "November", "December"];
+            body[monthNames[firstmonth.getMonth()]]=[]
+            usr.forEach((value)=>{
+                var firstday=new Date(date.getFullYear(), firstmonth.getMonth(), 1);
+                var lastDay=new Date(date.getFullYear(), firstmonth.getMonth()+1, 0);
+                var nm=monthNames[firstmonth.getMonth()]
+                if(value.createdAt>=firstday&&value.createdAt<=lastDay){
+                    body[nm].push(value);
+                }
+                else if(value.createdAt>lastDay){
+                    firstmonth=new Date(value.createdAt);
+                    body[monthNames[firstmonth.getMonth()]]=[]
+                    body[monthNames[firstmonth.getMonth()]].push(value)
+                }
+            })
+
+            return res.status(200).json({
+                'data':body
+            })
+        });
+        
+        /*console.log(firstday)
+        Transactions.find({createdAt:{$gt:firstday,$lt:lastDay}},(err,usr)=>{
+            return res.status(200).json({
+                "data":usr
+            })
+        });*/
     }
 }

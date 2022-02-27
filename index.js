@@ -5,7 +5,7 @@ const env=require('dotenv')
 const cors=require('cors');
 
 env.config();
-const { checkServer, login, signUp, addCredit, addDebit, delItem, getAll, getUsrData } = require('./controller/controller');
+const { checkServer, login, signUp, addCredit, addDebit, delItem, getAll, getUsrData, getMonthData } = require('./controller/controller');
 
 app.use(cors());
 
@@ -29,6 +29,7 @@ app.post('/addDebit',addDebit);
 app.post('/delItem',delItem);
 app.post('/getAll',getAll);
 app.post('/getUsrData',getUsrData);
+app.post('/getMonthData',getMonthData);
 
 
 app.listen(process.env.PORT,()=>{
