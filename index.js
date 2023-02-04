@@ -43,7 +43,6 @@ transporter.verify().then(console.log).catch(console.error);
 //setInterval(scrapeData, );
 const schedule = require('node-schedule');
 const rule = new schedule.RecurrenceRule();
-rule.dayOfWeek = 7;
 rule.hour=9;
 rule.minute=15;
 
