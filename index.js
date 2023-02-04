@@ -5,13 +5,13 @@ const env=require('dotenv')
 const cors=require('cors');
 
 env.config();
-const { checkServer, login, signUp, addCredit, addDebit, delItem, getAll, getUsrData, getMonthData } = require('./controller/controller');
+const { checkServer, addCredit, addDebit, delItem, getAll, getMonthData,addCard,delCard,addSharetoWatch } = require('./controller/controller');
 
 app.use(cors());
 
-
+mongoose.set('strictQuery', false);
 var conn=mongoose.connect(
-    `mongodb+srv://${process.env.USERID}:${process.env.PASSWORD}@cbot-backend.htcws.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`,
+    `mongodb+srv://${process.env.USERID}:${process.env.PASSWORD}@bms.bb2ybgv.mongodb.net/?retryWrites=true&w=majority`,
     {
         useNewUrlParser:true,
         useUnifiedTopology:true
@@ -21,14 +21,55 @@ var conn=mongoose.connect(
 })
 app.use(express.json());
 
+
+
+//share
+
+
+const nodemailer = require('nodemailer');
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 587,
+  auth: {
+    user: 'noreply.finleafy@gmail.com',
+    pass: 'yyzhnwfeamcfskxn',
+  },
+});
+transporter.verify().then(console.log).catch(console.error);
+
+
+
+
+//setInterval(scrapeData, );
+const schedule = require('node-schedule');
+const rule = new schedule.RecurrenceRule();
+rule.dayOfWeek = 7;
+rule.hour=9;
+rule.minute=15;
+
+const job = schedule.scheduleJob(rule, function(){
+    transporter.sendMail({
+        from: '"Finleafy" <noreply.finleafy@gmail.com>', // sender address
+        to: "adityanandi550@gmail.com", // list of receivers
+        subject: "Medium @edigleyssonsilva ✔", // Subject line
+        text: "There is a new article. It's about sending emails, check it out!", // plain text body
+        html: "<b>There is a new article. It's about sending emails, check it out!</b>", // html body
+      }).then(info => {
+        console.log({info});
+      }).catch(console.error);
+});
+
+
+
+
 app.get('/',checkServer);
-app.post('/login',login);
-app.post('/signUp',signUp);
 app.post('/addCredit',addCredit);
 app.post('/addDebit',addDebit);
 app.post('/delItem',delItem);
+app.post('/addCard',addCard);
+app.post('/delCard',delCard);
+app.post('/addSharetoWatch',addSharetoWatch);
 app.post('/getAll',getAll);
-app.post('/getUsrData',getUsrData);
 app.post('/getMonthData',getMonthData);
 
 
