@@ -45,7 +45,7 @@ const schedule = require('node-schedule');
 const rule = new schedule.RecurrenceRule();
 rule.tz = 'IST';
 rule.hour=9;
-rule.minute=48;
+rule.minute=55;
 
 const job = schedule.scheduleJob(rule, function(){
     transporter.sendMail({
