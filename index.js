@@ -39,24 +39,41 @@ transporter.verify().then(console.log).catch(console.error);
 
 
 
-
+//nodemailer
+/*transporter.sendMail({
+  from: '"Finleafy" <noreply.finleafy@gmail.com>', // sender address
+  to: "adityanandi550@gmail.com", // list of receivers
+  subject: "Medium @edigleyssonsilva ✔", // Subject line
+  text: "There is a new article. It's about sending emails, check it out!", // plain text body
+  html: "<b>There is a new article. It's about sending emails, check it out!</b>", // html body
+}).then(info => {
+  console.log({info});
+}).catch(console.error);*/
 //setInterval(scrapeData, );
+/*const cron=require('node-cron');
+cron.schedule(
+  '* * * * *',
+  () => {
+    const date = new Date();
+
+    console.log(`This task is running every minute - ${date.getHours()}:${date.getMinutes()}`);
+  },
+  {
+    scheduled: true,
+    timezone: 'Europe/Paris',
+    name: 'simple-task',
+    recoverMissedExecutions: false,
+  },
+);*/
+
+
 const schedule = require('node-schedule');
 const rule = new schedule.RecurrenceRule();
-rule.tz = 'IST';
-rule.hour=9;
-rule.minute=55;
+rule.second=0;
 
 const job = schedule.scheduleJob(rule, function(){
-    transporter.sendMail({
-        from: '"Finleafy" <noreply.finleafy@gmail.com>', // sender address
-        to: "adityanandi550@gmail.com", // list of receivers
-        subject: "Medium @edigleyssonsilva ✔", // Subject line
-        text: "There is a new article. It's about sending emails, check it out!", // plain text body
-        html: "<b>There is a new article. It's about sending emails, check it out!</b>", // html body
-      }).then(info => {
-        console.log({info});
-      }).catch(console.error);
+  const date = new Date();
+  console.log(`This task is running every minute - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`);
 });
 
 
