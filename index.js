@@ -100,7 +100,21 @@ async function watchme(){
 
 }
 
+const job2 = schedule.scheduleJob("30 9 * * 1-5", watchme2);
 
+async function watchme2(){
+  const date = new Date();
+  transporter.sendMail({
+    from: '"Finleafy Notify" <noreply.finleafy@gmail.com>', // sender address
+    to: "adityanandi550@gmail.com", // list of receivers
+    subject: `SERVER MAIL CRON @ ${date.getHours()}:${date.getMinutes()}`, // Subject line
+    text: "There is a new article. It's about sending emails, check it out!", // plain text body
+    html: "<b>There is a new article. It's about sending emails, check it out!</b>", // html body
+  }).then(info => {
+    console.log({info});
+  }).catch(console.error);
+
+}
 
 
 app.get('/',checkServer);
