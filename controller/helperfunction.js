@@ -2,7 +2,7 @@ const ShareList=require('../model/ShareList')
 
 
 module.exports=async function shareadd(v) {
-    const axios = require("axios");
+    /*const axios = require("axios");
     const url = `https://www.google.com/search?q=${v}+share+price`;
     const jsdom = require("jsdom");
     const Share = require('./model/Share');
@@ -17,5 +17,5 @@ module.exports=async function shareadd(v) {
       })
     } catch (err) {
       console.error(err);
-    }
+    }*/
   }

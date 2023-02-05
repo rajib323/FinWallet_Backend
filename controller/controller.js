@@ -121,14 +121,31 @@ exports.addSharetoWatch=async (req,res)=>{
     try {
       const { data } = await axios.get(url);
       const dom = new JSDOM(data);
-      const d=dom.window.document.querySelector('.BNeawe .iBp4i').textContent.split(' ')
+      const d=dom.window.document.querySelector('.BNeawe .iBp4i').textContent.replace(',','').split(' ')
+      
+      
+      console.log(`--------------------------------`)
+      console.log(`New added : ${req.body.uin}  ${parseFloat(d[0])}`)
+      console.log(`--------------------------------`)
+
       
       ShareList.create({uin:req.body.uin,price:parseFloat(d[0])},(err,usr)=>{
-        if(usr)
-            return res.status(200).json({'message':'added'})
-        return res.status(404).json({'message':'error'})
       })
-    } catch (err) {
-        return res.status(404).json({'message':'error'})
+
+      const fs=require('fs')
+      
+      fs.appendFile('./WatchList/watchlist.log', `\r\n${req.body.uin}`, err => {
+        if (err) {
+            return res.status(404).json({'message':'error'});
+        }
+        return res.status(200).json({'message':'added'});
+      });
+
+
+    }  catch (err) {
+        if (e instanceof TypeError) {
+            // statements to handle TypeError exceptions
+            return res.status(404).json({'message':'error'});
+          }
     }
 }

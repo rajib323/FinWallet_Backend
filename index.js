@@ -35,7 +35,7 @@ const transporter = nodemailer.createTransport({
     pass: 'yyzhnwfeamcfskxn',
   },
 });
-transporter.verify().then(console.log).catch(console.error);
+transporter.verify();
 
 
 
@@ -68,22 +68,38 @@ cron.schedule(
 
 
 const schedule = require('node-schedule');
-const rule = new schedule.RecurrenceRule();
-rule.hour=11;
-rule.minute=10;
+const fs=require('fs')
+const ShareList = require('./model/ShareList');
+const e = require('express');
+const axios = require("axios");
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
+//*/8 * 9.30-3:30 * * 1-5
+const job = schedule.scheduleJob("*/8 30 10-15 * * 1-5", watchme);
 
-const job = schedule.scheduleJob('* * * * *', function(){
-  const date = new Date();
-  transporter.sendMail({
-    from: '"Finleafy" <noreply.finleafy@gmail.com>', // sender address
-    to: "adityanandi550@gmail.com", // list of receivers
-    subject: 'Update time cron job', // Subject line
-    text: "`This task is running every minute - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`", // plain text body
+async function watchme(){
+  fs.readFile('./WatchList/watchlist.log','utf-8',(err,data)=>{
+    var lst=data.split("\r\n")
+    console.log(`--------------------------------`)
     
-  }).then(info => {
-    console.log({info});
-  }).catch(console.error);
-});
+    lst.forEach(async element => {
+      
+      const url = `https://www.google.com/search?q=${element}+share+price`;
+
+      const { data } = await axios.get(url);
+      const dom = new JSDOM(data);
+
+      const d=dom.window.document.querySelector('.BNeawe .iBp4i').textContent.replace(',','').split(' ')
+      
+
+      ShareList.findOneAndUpdate({uin:element},{price:parseFloat(d[0])},{returnOriginal:false},(err,usr)=>{})
+    });
+  
+  })
+  console.log(`--------------------------------`)
+
+}
+
 
 
 

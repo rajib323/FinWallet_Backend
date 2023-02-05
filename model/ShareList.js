@@ -3,6 +3,7 @@ const ShareList=mongoose.Schema({
     uin:{
         type:String,
         required:true,
+        unique:true
     },
     price:{
         type:Number,
