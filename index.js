@@ -42,7 +42,7 @@ transporter.verify().then(console.log).catch(console.error);
 //nodemailer
 /**/
 //setInterval(scrapeData, );
-const cron=require('node-cron');
+/*const cron=require('node-cron');
 cron.schedule(
   '* * * * *',
   () => {
@@ -64,18 +64,18 @@ cron.schedule(
     name: 'simple-task',
     recoverMissedExecutions: false,
   },
-);
+);*/
 
 
-/*const schedule = require('node-schedule');
+const schedule = require('node-schedule');
 const rule = new schedule.RecurrenceRule();
-rule.second=0;
+rule.hour=11;
+rule.minute=5;
 
 const job = schedule.scheduleJob(rule, function(){
   const date = new Date();
   console.log(`This task is running every minute - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`);
-});*/
-
+});
 
 
 
