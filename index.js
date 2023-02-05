@@ -50,7 +50,7 @@ transporter.verify().then(console.log).catch(console.error);
   console.log({info});
 }).catch(console.error);*/
 //setInterval(scrapeData, );
-/*const cron=require('node-cron');
+const cron=require('node-cron');
 cron.schedule(
   '* * * * *',
   () => {
@@ -60,21 +60,21 @@ cron.schedule(
   },
   {
     scheduled: true,
-    timezone: 'Europe/Paris',
+    timezone: 'Asia/Kolkata',
     name: 'simple-task',
     recoverMissedExecutions: false,
   },
-);*/
+);
 
 
-const schedule = require('node-schedule');
+/*const schedule = require('node-schedule');
 const rule = new schedule.RecurrenceRule();
 rule.second=0;
 
 const job = schedule.scheduleJob(rule, function(){
   const date = new Date();
   console.log(`This task is running every minute - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`);
-});
+});*/
 
 
 
