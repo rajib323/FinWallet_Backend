@@ -43,8 +43,9 @@ transporter.verify().then(console.log).catch(console.error);
 //setInterval(scrapeData, );
 const schedule = require('node-schedule');
 const rule = new schedule.RecurrenceRule();
+rule.tz = 'IST';
 rule.hour=9;
-rule.minute=15;
+rule.minute=48;
 
 const job = schedule.scheduleJob(rule, function(){
     transporter.sendMail({
@@ -62,20 +63,6 @@ const job = schedule.scheduleJob(rule, function(){
 
 
 app.get('/',checkServer);
-app.get('/sendmail',(req,res)=>{
-    transporter.sendMail({
-        from: '"Finleafy" <noreply.finleafy@gmail.com>', // sender address
-        to: "adityanandi550@gmail.com", // list of receivers
-        subject: "Medium @edigleyssonsilva ✔", // Subject line
-        text: "Hey buddy", // plain text body
-        html: "<b>There is a new article. It's about sending emails, check it out!</b>", // html body
-      }).then(info => {
-
-        res.send('Hey Buddy sent you a mail')
-
-        console.log({info});
-      }).catch(console.error);
-});
 app.post('/addCredit',addCredit);
 app.post('/addDebit',addDebit);
 app.post('/delItem',delItem);
