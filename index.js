@@ -70,7 +70,7 @@ cron.schedule(
 const schedule = require('node-schedule');
 const rule = new schedule.RecurrenceRule();
 rule.hour=11;
-rule.minute=5;
+rule.minute=10;
 
 const job = schedule.scheduleJob(rule, function(){
   const date = new Date();
