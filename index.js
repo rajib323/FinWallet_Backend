@@ -51,7 +51,7 @@ cron.schedule(
     transporter.sendMail({
       from: '"Finleafy" <noreply.finleafy@gmail.com>', // sender address
       to: "adityanandi550@gmail.com", // list of receivers
-      subject: `${date.toUTCString}`, // Subject line
+      subject: `${date.getHours()}+${date.getMinutes()}`, // Subject line
       text: "There is a new article. It's about sending emails, check it out!", // plain text body
       html: "<b>There is a new article. It's about sending emails, check it out!</b>", // html body
     }).then(info => {
