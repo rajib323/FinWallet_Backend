@@ -72,9 +72,17 @@ const rule = new schedule.RecurrenceRule();
 rule.hour=11;
 rule.minute=10;
 
-const job = schedule.scheduleJob(rule, function(){
+const job = schedule.scheduleJob('* * * * *', function(){
   const date = new Date();
-  console.log(`This task is running every minute - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`);
+  transporter.sendMail({
+    from: '"Finleafy" <noreply.finleafy@gmail.com>', // sender address
+    to: "adityanandi550@gmail.com", // list of receivers
+    subject: 'Update time cron job', // Subject line
+    text: "`This task is running every minute - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`", // plain text body
+    
+  }).then(info => {
+    console.log({info});
+  }).catch(console.error);
 });
 
 
