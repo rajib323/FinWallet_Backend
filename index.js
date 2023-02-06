@@ -75,7 +75,7 @@ const axios = require("axios");
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 //*/8 * 9.30-3:30 * * 1-5
-const job = schedule.scheduleJob("*/8 30 10-15 * * 1-5", watchme);
+const job = schedule.scheduleJob("*/8 40 9-15 * * 1-5", watchme);
 
 async function watchme(){
   fs.readFile('./WatchList/watchlist.log','utf-8',(err,data)=>{
