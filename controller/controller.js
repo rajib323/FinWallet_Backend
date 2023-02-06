@@ -1,8 +1,10 @@
 const Transactions = require("../model/Transactions");
 const Cards = require("../model/Cards");
 const Share = require("../model/Share");
+const axios = require("axios");
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
 const BitCoin=require('../model/BitCoin')
-const axios=require('axios')
 const ShareList = require("../model/ShareList");
 
 exports.checkServer=(req,res)=>{
@@ -197,4 +199,33 @@ exports.saveLiveData=async (req,resp)=>{
 
 
     return resp.status(200).json({"message":"updated"});
+}
+
+
+exports.sharevalueupdate=(req,res)=>{
+    console.log(`--------------------------------`)
+    ShareList.find({},(err,usr)=>{
+        if(usr){
+        var usrmap={}
+        usr.forEach(async function(user) {
+            const url = `https://www.google.com/search?q=${user.uin}+share+price`;
+            
+            const { data } = await axios.get(url);
+            const dom = new JSDOM(data);
+
+
+
+            var d=dom.window.document.querySelector('.BNeawe .iBp4i').textContent.replace(',','').split(' ')
+            
+            console.log(`${user.uin}  ${d[0]}`)
+            
+
+            ShareList.updateOne({uin:user.uin},{price:parseFloat(d[0])},{returnOriginal:false},(err,usr)=>{})
+        });
+        
+        
+        }
+        console.log(`--------------------------------`)
+    })
+    return res.status(200).json({"message":"updated"});
 }
