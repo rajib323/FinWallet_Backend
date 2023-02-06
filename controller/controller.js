@@ -1,6 +1,8 @@
 const Transactions = require("../model/Transactions");
 const Cards = require("../model/Cards");
 const Share = require("../model/Share");
+const BitCoin=require('../model/BitCoin')
+const axios=require('axios')
 const ShareList = require("../model/ShareList");
 
 exports.checkServer=(req,res)=>{
@@ -122,25 +124,19 @@ exports.addSharetoWatch=async (req,res)=>{
       const { data } = await axios.get(url);
       const dom = new JSDOM(data);
       const d=dom.window.document.querySelector('.BNeawe .iBp4i').textContent.replace(',','').split(' ')
-      
-      
-      console.log(`--------------------------------`)
-      console.log(`New added : ${req.body.uin}  ${parseFloat(d[0])}`)
-      console.log(`--------------------------------`)
 
       
       ShareList.create({uin:req.body.uin,price:parseFloat(d[0])},(err,usr)=>{
-      })
-
-      const fs=require('fs')
-      
-      fs.appendFile('./WatchList/watchlist.log', `\r\n${req.body.uin}`, err => {
-        if (err) {
-            return res.status(404).json({'message':'error'});
+        if(usr){
+            console.log(`--------------------------------`)
+            console.log(`New added : ${req.body.uin}  ${parseFloat(d[0])}`)
+            console.log(`--------------------------------`)
+            return res.status(200).json({'message':'added'});
         }
-        return res.status(200).json({'message':'added'});
-      });
-
+        if(err){
+            return res.status(404).json({'message':err});
+        }
+      })
 
     }  catch (err) {
         if (e instanceof TypeError) {
@@ -148,4 +144,57 @@ exports.addSharetoWatch=async (req,res)=>{
             return res.status(404).json({'message':'error'});
           }
     }
+}
+
+
+exports.getBTCDATA=async (req,res)=>{
+    req.body.crypto.forEach(async(e)=>{
+        var res=await axios.get(`http://api.coinlayer.com/live?access_key=fb8757651eb1ffb522235b6d346a2675&symbols=${e.symbol}`)
+        var resData=JSON.parse(JSON.stringify(res.data))
+        var price=parseFloat(JSON.stringify(resData.rates).replace('{','').replace('}','').split(':')[1])
+        BitCoin.create({
+            'symbol':e.symbol,
+            'name':e.name,
+            'name_full':e.name_full,
+            'maxsupply':e.symbol,
+            'iconurl':e.icon_url,
+            'price':price
+
+        },(err,usr)=>{
+            console.log(e)
+        });
+    })
+    return res.status(200).json({"message":"added"});
+}
+
+
+exports.getAllBTCDATA=async (req,res)=>{
+    BitCoin.find({},(err,usr)=>{
+        return res.status(200).json(
+            {
+                "data":usr
+            }
+        )
+    })
+}
+
+
+exports.saveLiveData=async (req,resp)=>{
+    
+    BitCoin.find({},(err,usr)=>{
+        if(usr){
+
+            usr.forEach(async function(user) {
+                var res=await axios.get(`http://api.coinlayer.com/live?access_key=fb8757651eb1ffb522235b6d346a2675&symbols=${user.symbol}`)
+                var resData=JSON.parse(JSON.stringify(res.data))
+                var price=parseFloat(JSON.stringify(resData.rates).replace('{','').replace('}','').split(':')[1])
+
+                BitCoin.updateOne({_id:user._id},{price:price},{returnOriginal:false},(err,usr)=>{})
+            });
+            //BitCoin.updateOne({})
+        }
+    })
+
+
+    return resp.status(200).json({"message":"updated"});
 }

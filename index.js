@@ -5,13 +5,11 @@ const env=require('dotenv')
 const cors=require('cors');
 
 env.config();
-const { checkServer, addCredit, addDebit, delItem, getAll, getMonthData,addCard,delCard,addSharetoWatch } = require('./controller/controller');
-
 app.use(cors());
 
 mongoose.set('strictQuery', false);
 var conn=mongoose.connect(
-    `mongodb+srv://${process.env.USERID}:${process.env.PASSWORD}@bms.bb2ybgv.mongodb.net/?retryWrites=true&w=majority`,
+  `mongodb+srv://${process.env.USERID}:${process.env.PASSWORD}@finleafy.tclcz9a.mongodb.net/?retryWrites=true&w=majority`,
     {
         useNewUrlParser:true,
         useUnifiedTopology:true
@@ -24,110 +22,74 @@ app.use(express.json());
 
 
 //share
-
-
-const nodemailer = require('nodemailer');
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  auth: {
-    user: 'noreply.finleafy@gmail.com',
-    pass: 'yyzhnwfeamcfskxn',
-  },
-});
-transporter.verify();
-
-
-
-//nodemailer
-/**/
-//setInterval(scrapeData, );
-/*const cron=require('node-cron');
-cron.schedule(
-  '* * * * *',
-  () => {
-    const date = new Date();
-
-    transporter.sendMail({
-      from: '"Finleafy" <noreply.finleafy@gmail.com>', // sender address
-      to: "adityanandi550@gmail.com", // list of receivers
-      subject: `${date.getHours()}+${date.getMinutes()}`, // Subject line
-      text: "There is a new article. It's about sending emails, check it out!", // plain text body
-      html: "<b>There is a new article. It's about sending emails, check it out!</b>", // html body
-    }).then(info => {
-      console.log({info});
-    }).catch(console.error);
-  },
-  {
-    scheduled: true,
-    timezone: 'Asia/Kolkata',
-    name: 'simple-task',
-    recoverMissedExecutions: false,
-  },
-);*/
-
-
-const schedule = require('node-schedule');
 const fs=require('fs')
 const ShareList = require('./model/ShareList');
-const e = require('express');
+const schedule=require('node-schedule')
 const axios = require("axios");
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
-//*/8 * 9.30-3:30 * * 1-5
-const job = schedule.scheduleJob("*/8 50 9-15 * * 1-5", watchme);
 
+
+//const job = schedule.scheduleJob("",()=>{});
+//8 30 9-15 * * *
 async function watchme(){
-  fs.readFile('./WatchList/watchlist.log','utf-8',(err,data)=>{
-    var lst=data.split("\r\n")
+  console.log(`--------------------------------`)
+  ShareList.find({},(err,usr)=>{
+    if(usr){
+      var usrmap={}
+      usr.forEach(async function(user) {
+        const url = `https://www.google.com/search?q=${user.uin}+share+price`;
+        
+        const { data } = await axios.get(url);
+        const dom = new JSDOM(data);
+
+
+
+        var d=dom.window.document.querySelector('.BNeawe .iBp4i').textContent.replace(',','').split(' ')
+        
+        console.log(`${user.uin}  ${d[0]}`)
+        
+
+        ShareList.updateOne({uin:user.uin},{price:parseFloat(d[0])},{returnOriginal:false},(err,usr)=>{})
+      });
+      
+      
+    }
     console.log(`--------------------------------`)
+  })
+  /*fs.readFile('./WatchList/watchlist.log','utf-8',(err,data)=>{
+    var lst=data.split("\r\n")
     
-    lst.forEach(async element => {
-      
-      const url = `https://www.google.com/search?q=${element}+share+price`;
-
-      const { data } = await axios.get(url);
-      const dom = new JSDOM(data);
-
-      const d=dom.window.document.querySelector('.BNeawe .iBp4i').textContent.replace(',','').split(' ')
-      
-
-      ShareList.findOneAndUpdate({uin:element},{price:parseFloat(d[0])},{returnOriginal:false},(err,usr)=>{})
-    });
   
   })
-  console.log(`--------------------------------`)
-
-}
-
-const job2 = schedule.scheduleJob("30 9 * * 1-5", watchme2);
-
-async function watchme2(){
-  const date = new Date();
-  transporter.sendMail({
-    from: '"Finleafy Notify" <noreply.finleafy@gmail.com>', // sender address
-    to: "adityanandi550@gmail.com", // list of receivers
-    subject: `SERVER MAIL CRON @ ${date.getHours()}:${date.getMinutes()}`, // Subject line
-    text: "There is a new article. It's about sending emails, check it out!", // plain text body
-    html: "<b>There is a new article. It's about sending emails, check it out!</b>", // html body
-  }).then(info => {
-    console.log({info});
-  }).catch(console.error);
+  console.log(`--------------------------------`)*/
 
 }
 
 
+watchme()
+//const job = schedule.scheduleJob("* * * * *",watchme);
+
+
+
+const { checkServer, addCredit,getAllBTCDATA, addDebit, delItem, getAll, getMonthData,addCard,delCard,addSharetoWatch, getBTCDATA, saveLiveData } = require('./controller/controller');
 app.get('/',checkServer);
-app.post('/addCredit',addCredit);
-app.post('/addDebit',addDebit);
-app.post('/delItem',delItem);
-app.post('/addCard',addCard);
-app.post('/delCard',delCard);
-app.post('/addSharetoWatch',addSharetoWatch);
-app.post('/getAll',getAll);
-app.post('/getMonthData',getMonthData);
+app.post('/addcredit',addCredit);
+app.post('/adddebit',addDebit);
+app.post('/delitem',delItem);
+app.post('/addcard',addCard);
+app.post('/delcard',delCard);
+app.post('/addsharetowatch',addSharetoWatch);
+app.post('/getall',getAll);
+app.post('/getmonthdata',getMonthData);
+
+//bitcoin
+app.post('/btcdata',getBTCDATA);
+app.get('/getallbtcdata',getAllBTCDATA);
+app.get('/btclivedata',saveLiveData);
 
 
 app.listen(process.env.PORT,()=>{
     console.log(`Server Started at ${process.env.PORT}`);
+    
 });
