@@ -52,7 +52,7 @@ exports.delItem=(req,res)=>{
     })
 }
 
-exports.getAll=(req,res)=>{
+exports.getAllTrans=(req,res)=>{
     Transactions.find({userId:req.body.userId},(err,usr)=>{
         return res.status(200).json({
             "data":usr
@@ -228,4 +228,22 @@ exports.sharevalueupdate=(req,res)=>{
         console.log(`--------------------------------`)
     })
     return res.status(200).json({"message":"updated"});
+}
+
+
+exports.getAllCard=(req,res)=>{
+    Cards.find({userId:req.body.userId},(err,usr)=>{
+        return res.status(200).json({
+            "data":usr
+        })
+    });
+}
+
+
+exports.getAllShare=(req,res)=>{
+    Share.find({userId:req.body.userId},(err,usr)=>{
+        return res.status(200).json({
+            "data":usr
+        })
+    });
 }

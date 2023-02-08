@@ -1,10 +1,14 @@
 const { default: mongoose } = require("mongoose");
 const Share=mongoose.Schema({
+    userid:{
+        type:String,
+        required:true,
+    },
     uin:{
         type:String,
         required:true,
     },
-    price:{
+    quantity:{
         type:Number,
         required:true
     }

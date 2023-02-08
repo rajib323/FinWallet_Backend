@@ -22,15 +22,26 @@ app.use(express.json());
 
 
 
-const { checkServer, addCredit,getAllBTCDATA, addDebit, delItem, getAll, getMonthData,sharevalueupdate,addCard,delCard,addSharetoWatch, getBTCDATA, saveLiveData } = require('./controller/controller');
+const { checkServer, addCredit,getAllBTCDATA, addDebit, delItem, getAllTrans,getAllCard,getAllShare}= require('./controller/controller');
+const {getMonthData,sharevalueupdate,addCard,delCard,addSharetoWatch, getBTCDATA, saveLiveData } = require('./controller/controller');
 app.get('/',checkServer);
 app.post('/addcredit',addCredit);
 app.post('/adddebit',addDebit);
 app.post('/delitem',delItem);
+
+
+//card
 app.post('/addcard',addCard);
 app.post('/delcard',delCard);
+
+//share
 app.post('/addsharetowatch',addSharetoWatch);
-app.post('/getall',getAll);
+
+
+//view data
+app.post('/getalltrans',getAllTrans);
+app.post('/getallcard',getAllCard);
+app.post('/getallshare',getAllShare);
 app.post('/getmonthdata',getMonthData);
 
 //bitcoin
