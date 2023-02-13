@@ -212,23 +212,28 @@ exports.sharevalueupdate=(req,res)=>{
         if(usr){
         var usrmap={}
         usr.forEach(async function(user) {
-            const url = `https://www.google.com/search?q=${user.uin}+share+price`;
+            try{
+                const url = `https://www.google.com/search?q=${user.uin}+share+price`;
             
-            const { data } = await axios.get(url);
-            const dom = new JSDOM(data);
+                const { data } = await axios.get(url);
+                const dom = new JSDOM(data);
 
 
 
-            var d=dom.window.document.querySelector('.BNeawe .iBp4i').textContent.replace(',','').split(' ')
-            
-            console.log(`${user.uin}  ${d[0]}`)
-            
+                var d=dom.window.document.querySelector('.BNeawe .iBp4i').textContent.replace(',','').split(' ')
+                
+                console.log(`${user.uin}  ${d[0]}`)
+                
 
-            ShareList.updateOne({uin:user.uin},{price:parseFloat(d[0])},{returnOriginal:false},(err,usr)=>{
-                if(err){
-                    return res.status(404).json({"message":err});
-                }
-            })
+                ShareList.updateOne({uin:user.uin},{price:parseFloat(d[0])},{returnOriginal:false},(err,usr)=>{
+                    if(err){
+                        return res.status(404).json({"message":err});
+                    }
+                })
+            }catch (err){
+                if(err)
+                return res.status(404).json({"message":err});
+            }
         });
         
         
