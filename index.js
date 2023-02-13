@@ -49,11 +49,14 @@ app.post('/btcdata',getBTCDATA);
 app.get('/getallbtcdata',getAllBTCDATA);
 
 //cron data
-app.get('/updatesharevalue',sharevalueupdate);//* 9-15 * * *
-app.get('/btclivedata',saveLiveData);//9-15 * * *
+app.put('/updatesharevalue',sharevalueupdate);//* 9-15 * * *
+app.put('/btclivedata',saveLiveData);//9-15 * * *
 
 
 app.listen(process.env.PORT,()=>{
     console.log(`Server Started at ${process.env.PORT}`);
     
 });
+
+//2023-02-13T07:19:21.437+00:00
+//2023-02-13T07:19:21.437+00:00

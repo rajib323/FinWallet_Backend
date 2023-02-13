@@ -191,14 +191,18 @@ exports.saveLiveData=async (req,resp)=>{
                 var resData=JSON.parse(JSON.stringify(res.data))
                 var price=parseFloat(JSON.stringify(resData.rates).replace('{','').replace('}','').split(':')[1])
 
-                BitCoin.updateOne({_id:user._id},{price:price},{returnOriginal:false},(err,usr)=>{})
+                BitCoin.updateOne({_id:user._id},{price:price},{returnOriginal:false},(err,usr)=>{
+                    if(err){
+                        return resp.status(404).json({"message":err});
+                    }
+                })
             });
             //BitCoin.updateOne({})
         }
     })
 
-
     return resp.status(200).json({"message":"updated"});
+    
 }
 
 
@@ -220,14 +224,19 @@ exports.sharevalueupdate=(req,res)=>{
             console.log(`${user.uin}  ${d[0]}`)
             
 
-            ShareList.updateOne({uin:user.uin},{price:parseFloat(d[0])},{returnOriginal:false},(err,usr)=>{})
+            ShareList.updateOne({uin:user.uin},{price:parseFloat(d[0])},{returnOriginal:false},(err,usr)=>{
+                if(err){
+                    return res.status(404).json({"message":err});
+                }
+            })
         });
         
         
         }
         console.log(`--------------------------------`)
+        return res.status(200).json({"message":"updated"});
     })
-    return res.status(200).json({"message":"updated"});
+    
 }
 
 
