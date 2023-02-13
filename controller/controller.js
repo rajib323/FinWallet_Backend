@@ -187,7 +187,7 @@ exports.saveLiveData=async (req,resp)=>{
         if(usr){
 
             usr.forEach(async function(user) {
-                var res=await axios.get(`http://api.coinlayer.com/live?access_key=fb8757651eb1ffb522235b6d346a2675&symbols=${user.symbol}`)
+                var res=await axios.get(`http://api.coinlayer.com/live?access_key=c1cd355c7dc3ac43e34679ea310e2312&symbols=${user.symbol}`)
                 var resData=JSON.parse(JSON.stringify(res.data))
                 var price=parseFloat(JSON.stringify(resData.rates).replace('{','').replace('}','').split(':')[1])
 
