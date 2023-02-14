@@ -7,9 +7,6 @@ const { JSDOM } = jsdom;
 const BitCoin=require('../model/BitCoin')
 const ShareList = require("../model/ShareList");
 
-exports.checkServer=(req,res)=>{
-    res.send('Hey Buddy working great')
-}
 exports.addCredit=(req,res)=>{
     Transactions.create({
         userId:req.body.userId,
@@ -28,6 +25,22 @@ exports.addCredit=(req,res)=>{
 
 exports.addDebit=(req,res)=>{
     Transactions.create({
+        userId:req.body.userId,
+        type:"D",
+        category:req.body.category,
+        description:req.body.desc,
+        amount:parseInt(req.body.amount)
+    },(err,usr)=>{
+        if(usr){
+            return res.status(200).json({
+                "message":"Added Successfully"
+            });
+        }
+    })
+}
+
+exports.modifytrans=(req,res)=>{
+    Transactions.findByIdAndUpdate({
         userId:req.body.userId,
         type:"D",
         category:req.body.category,

@@ -1,11 +1,20 @@
-const express=require('express')
-const app=express();
-const mongoose=require('mongoose')
-const env=require('dotenv')
-const cors=require('cors');
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const env = require("dotenv");
+const router = require("express").Router();;
+
 
 env.config();
+const app=express();
+
+
 app.use(cors());
+app.use(router);
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+
 
 mongoose.set('strictQuery', false);
 var conn=mongoose.connect(
@@ -17,46 +26,53 @@ var conn=mongoose.connect(
 ).then(()=>{
     console.log("Database Connected");
 })
-app.use(express.json());
+
 
 
 
 
 const { checkServer, addCredit,getAllBTCDATA, addDebit, delItem, getAllTrans,getAllCard,getAllShare}= require('./controller/controller');
 const {getMonthData,sharevalueupdate,addCard,delCard,addSharetoWatch, getBTCDATA, saveLiveData } = require('./controller/controller');
-app.get('/',checkServer);
-app.post('/addcredit',addCredit);
-app.post('/adddebit',addDebit);
-app.post('/delitem',delItem);
+
+
+
+//router
+router.get('/',(req,res)=>{
+    res.send('Hey Buddy working great')
+});
+
+//transactions
+router.post('/addcredit',addCredit);
+router.post('/adddebit',addDebit);
+router.post('/modifytrans',(req,res)=>{});
+router.post('/deltrans',delItem);
+router.post('/getalltrans',getAllTrans);
+router.post('/getmonthdata',getMonthData);
 
 
 //card
-app.post('/addcard',addCard);
-app.post('/delcard',delCard);
+router.post('/verify',addCard);
+router.post('/delcard',delCard);
+router.post('/getallcard',getAllCard);
 
 //share
-app.post('/addsharetowatch',addSharetoWatch);
+router.post('/addsharetowatch',addSharetoWatch);
+router.post('/getallshare',getAllShare);
+router.post('/addShare',(req,res)=>{});
+router.post('/modifyshare',(req,res)=>{});
+router.post('/delShare',(req,res)=>{});
 
-
-//view data
-app.post('/getalltrans',getAllTrans);
-app.post('/getallcard',getAllCard);
-app.post('/getallshare',getAllShare);
-app.post('/getmonthdata',getMonthData);
 
 //bitcoin
-app.post('/btcdata',getBTCDATA);
-app.get('/getallbtcdata',getAllBTCDATA);
+router.post('/btcdata',getBTCDATA);
+router.get('/getallbtcdata',getAllBTCDATA);
 
 //cron data
-app.put('/updatesharevalue',sharevalueupdate);//* 9-15 * * *
-app.put('/btclivedata',saveLiveData);//9-15 * * *
+router.put('/updatesharevalue',sharevalueupdate);//* 9-15 * * *
+//router.put('/btclivedata',saveLiveData);//9-15 * * *
 
 
 app.listen(process.env.PORT,()=>{
     console.log(`Server Started at ${process.env.PORT}`);
     
 });
-
-//2023-02-13T08:19:17.993+00:00
-//
