@@ -7,7 +7,9 @@ const { JSDOM } = jsdom;
 const BitCoin=require('../model/BitCoin')
 const ShareList = require("../model/ShareList");
 
+//Transactions
 exports.addCredit=(req,res)=>{
+    console.log(req.body)
     Transactions.create({
         userId:req.body.userId,
         type:"C",
@@ -20,10 +22,11 @@ exports.addCredit=(req,res)=>{
                 "message":"Added Successfully"
             });
         }
+        return res.status(404).json({"message":err});
     })
 }
-
 exports.addDebit=(req,res)=>{
+    console.log(req.body)
     Transactions.create({
         userId:req.body.userId,
         type:"D",
@@ -36,37 +39,116 @@ exports.addDebit=(req,res)=>{
                 "message":"Added Successfully"
             });
         }
+        return res.status(404).json({"message":err});
     })
 }
-
 exports.modifytrans=(req,res)=>{
+    console.log(req.body)
     Transactions.findByIdAndUpdate({
-        userId:req.body.userId,
-        type:"D",
+        _id:req.body.id},{
+        type:req.body.type,
         category:req.body.category,
         description:req.body.desc,
         amount:parseInt(req.body.amount)
     },(err,usr)=>{
         if(usr){
             return res.status(200).json({
-                "message":"Added Successfully"
+                "message":"Updated Successfully"
             });
         }
+        return res.status(404).json({"message":err});
     })
 }
-
-
 exports.delItem=(req,res)=>{
-    Transactions.deleteOne(req.body.id,(err,usr)=>{
+    console.log(req.body)
+    Transactions.deleteOne({_id:req.body.id},(err,usr)=>{
         if(err){
-            return res.status(404).json({"message":'error'});
+            return res.status(404).json({"message":err});
         }
         return res.status(200).json({"message":'done'});
     })
 }
-
 exports.getAllTrans=(req,res)=>{
-    Transactions.find({userId:req.body.userId},(err,usr)=>{
+    console.log(req.body)
+    Transactions.find({userId:req.query.userId},(err,usr)=>{
+        if(err){
+            return res.status(404).json({"message":err});
+        }
+        return res.status(200).json({
+            "data":usr
+        })
+    });
+}
+exports.getMonthData=(req,res)=>{
+
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+    ];
+    body={}
+    Transactions.find({userId:req.query.userId},(err,usr)=>{
+        if(usr){
+            usr.forEach((user)=>{
+                const date=new Date(user.createdAt)
+                if(body[`${monthNames[date.getMonth()]} ${date.getFullYear()}`]==null){
+                    body[`${monthNames[date.getMonth()]} ${date.getFullYear()}`]=[user]
+                }
+                else{
+                    body[`${monthNames[date.getMonth()]} ${date.getFullYear()}`].push(user)
+                }
+                
+            })
+    
+            return res.status(200).json({
+                'data':body
+            })
+        }
+        return res.status(404).json({
+            'data':err
+        })
+    });
+}
+
+
+//card
+exports.addCard=(req,res)=>{
+    console.log(req.body)
+    Cards.create({
+        userId:req.body.userId,
+        cardtype:req.body.type,
+        uin:req.body.uin,
+        company:req.body.company,
+        validmonth:req.body.validmonth==null?0:req.body.validmonth,
+        validyr:req.body.validyr==null?0:req.body.validyr,
+        cvv:req.body.cvv==null?0:req.body.cvv,
+        amount:parseInt(req.body.amount==null?0:req.body.amount)
+        
+    },(err,usr)=>{
+        if(err){
+            return res.status(404).json({"message":err});
+        }
+        return res.status(200).json({"message":'Card added'});
+    });
+}
+
+exports.delCard=(req,res)=>{
+    Cards.deleteOne({
+        uin:req.body.uin
+    },(err,usr)=>{
+        if(err){
+            return res.status(404).json({"message":err});
+        }
+        return res.status(200).json({"message":'done'});
+    });
+}
+exports.getAllCard=(req,res)=>{
+    Cards.find({userId:req.query.userId},(err,usr)=>{
+        return res.status(200).json({
+            "data":usr
+        })
+    });
+}
+exports.getAllShare=(req,res)=>{
+    Share.find({userId:req.body.userId},(err,usr)=>{
         return res.status(200).json({
             "data":usr
         })
@@ -74,61 +156,7 @@ exports.getAllTrans=(req,res)=>{
 }
 
 
-exports.getMonthData=(req,res)=>{
-    Transactions.find({userId:req.body.id},(err,usr)=>{
-        const date=new Date();
-        var body={};
-        var firstmonth=new Date(usr[0].createdAt);
-        const monthNames = ["January", "February", "March", "April", "May", "June","July", "August", "September", "October", "November", "December"];
-        body[monthNames[firstmonth.getMonth()]]=[]
-        usr.forEach((value)=>{
-            var firstday=new Date(date.getFullYear(), firstmonth.getMonth(), 1);
-            var lastDay=new Date(date.getFullYear(), firstmonth.getMonth()+1, 0);
-            var nm=monthNames[firstmonth.getMonth()]
-            if(value.createdAt>=firstday&&value.createdAt<=lastDay){
-                body[nm].push(value);
-            }
-            else if(value.createdAt>lastDay){
-                firstmonth=new Date(value.createdAt);
-                body[monthNames[firstmonth.getMonth()]]=[]
-                body[monthNames[firstmonth.getMonth()]].push(value)
-            }
-        })
-
-        return res.status(200).json({
-            'data':body
-        })
-    });
-}
-
-
-exports.addCard=(req,res)=>{
-    Cards.create({
-        userId:req.body.userId,
-        cardtype:req.body.cardType,
-        uin:req.body.uin,
-        validmonth:req.body.validmonth,
-        validyr:req.body.validyr,
-        cvv:req.body.cvv,
-        amount:parseInt(req.body.amount)
-    },(err,usr)=>{
-        if(err){
-            return res.status(404).json({"message":'error'});
-        }
-        return res.status(404).json({"message":'done'});
-    });
-}
-exports.delCard=(req,res)=>{
-    Cards.delItem({
-        uin:req.body.uin
-    },(err,usr)=>{
-        if(err){
-            return res.status(404).json({"message":'error'});
-        }
-        return res.status(404).json({"message":'done'});
-    });
-}
-
+//share
 exports.addSharetoWatch=async (req,res)=>{
     const axios = require("axios");
     const url = `https://www.google.com/search?q=${req.body.uin}+share+price`;
@@ -159,6 +187,43 @@ exports.addSharetoWatch=async (req,res)=>{
             return res.status(404).json({'message':'error'});
           }
     }
+}
+exports.sharevalueupdate=(req,res)=>{
+    console.log(`--------------------------------`)
+    ShareList.find({},(err,usr)=>{
+        if(usr){
+        var usrmap={}
+        usr.forEach(async function(user) {
+            try{
+                const url = `https://www.google.com/search?q=${user.uin}+share+price`;
+            
+                const { data } = await axios.get(url);
+                const dom = new JSDOM(data);
+
+
+
+                var d=dom.window.document.querySelector('.BNeawe .iBp4i').textContent.replace(',','').split(' ')
+                
+                console.log(`${user.uin}  ${d[0]}`)
+                
+
+                ShareList.updateOne({uin:user.uin},{price:parseFloat(d[0])},{returnOriginal:false},(err,usr)=>{
+                    if(err){
+                        return res.status(404).json({"message":err});
+                    }
+                })
+            }catch (err){
+                if(err)
+                return res.status(404).json({"message":err});
+            }
+        });
+        
+        
+        }
+        console.log(`--------------------------------`)
+        return res.status(200).json({"message":"updated"});
+    })
+    
 }
 
 
@@ -219,58 +284,9 @@ exports.saveLiveData=async (req,resp)=>{
 }
 
 
-exports.sharevalueupdate=(req,res)=>{
-    console.log(`--------------------------------`)
-    ShareList.find({},(err,usr)=>{
-        if(usr){
-        var usrmap={}
-        usr.forEach(async function(user) {
-            try{
-                const url = `https://www.google.com/search?q=${user.uin}+share+price`;
-            
-                const { data } = await axios.get(url);
-                const dom = new JSDOM(data);
 
 
 
-                var d=dom.window.document.querySelector('.BNeawe .iBp4i').textContent.replace(',','').split(' ')
-                
-                console.log(`${user.uin}  ${d[0]}`)
-                
-
-                ShareList.updateOne({uin:user.uin},{price:parseFloat(d[0])},{returnOriginal:false},(err,usr)=>{
-                    if(err){
-                        return res.status(404).json({"message":err});
-                    }
-                })
-            }catch (err){
-                if(err)
-                return res.status(404).json({"message":err});
-            }
-        });
-        
-        
-        }
-        console.log(`--------------------------------`)
-        return res.status(200).json({"message":"updated"});
-    })
-    
-}
 
 
-exports.getAllCard=(req,res)=>{
-    Cards.find({userId:req.body.userId},(err,usr)=>{
-        return res.status(200).json({
-            "data":usr
-        })
-    });
-}
 
-
-exports.getAllShare=(req,res)=>{
-    Share.find({userId:req.body.userId},(err,usr)=>{
-        return res.status(200).json({
-            "data":usr
-        })
-    });
-}

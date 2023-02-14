@@ -16,18 +16,24 @@ const Cards=mongoose.Schema({
     },
     validmonth:{
         type:Number,
-        required:true
+        default:0
     },
     validyr:{
         type:Number,
-        required:true
+        default:0
     },
     cvv:{
         type:Number,
-        required:true
+        default:0
+    },
+    company:{
+        type:String,
+        required:true,
+        default:0
     },
     amount:{
         type:Number,
+        default:0
     }
 },{timestamps:true});
 

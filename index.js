@@ -2,7 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const env = require("dotenv");
-const router = require("express").Router();;
+const router = require("express").Router();
+
 
 
 env.config();
@@ -11,7 +12,7 @@ const app=express();
 
 app.use(cors());
 app.use(router);
-app.use(express.json());
+router.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 
@@ -31,9 +32,8 @@ var conn=mongoose.connect(
 
 
 
-const { checkServer, addCredit,getAllBTCDATA, addDebit, delItem, getAllTrans,getAllCard,getAllShare}= require('./controller/controller');
+const { checkServer, addCredit,getAllBTCDATA, addDebit, delItem, getAllTrans,getAllCard,getAllShare, modifytrans}= require('./controller/controller');
 const {getMonthData,sharevalueupdate,addCard,delCard,addSharetoWatch, getBTCDATA, saveLiveData } = require('./controller/controller');
-
 
 
 //router
@@ -42,18 +42,18 @@ router.get('/',(req,res)=>{
 });
 
 //transactions
-router.post('/addcredit',addCredit);
-router.post('/adddebit',addDebit);
-router.post('/modifytrans',(req,res)=>{});
-router.post('/deltrans',delItem);
-router.post('/getalltrans',getAllTrans);
-router.post('/getmonthdata',getMonthData);
+router.post('/addcredit',addCredit);      //checked
+router.post('/adddebit',addDebit);      //checked
+router.put('/modifytrans',modifytrans);     //checked
+router.delete('/deltrans',delItem);           //checked
+router.get('/getalltrans',getAllTrans);    //checked
+router.get('/getmonthdata',getMonthData);  //checked
 
 
 //card
-router.post('/verify',addCard);
-router.post('/delcard',delCard);
-router.post('/getallcard',getAllCard);
+router.post('/verify',addCard);     
+router.delete('/delcard',delCard);
+router.get('/getallcard',getAllCard);
 
 //share
 router.post('/addsharetowatch',addSharetoWatch);
