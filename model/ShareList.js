@@ -6,7 +6,7 @@ const ShareList=mongoose.Schema({
         unique:true
     },
     price:{
-        type:Number,
+        type:Double,
         required:true
     },
 },{timestamps:true});

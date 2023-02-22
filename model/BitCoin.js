@@ -22,7 +22,7 @@ const BitCoin=mongoose.Schema({
         type:String
     },
     price:{
-        type:Number,
+        type:Double,
         required:true,
         default:0
     }

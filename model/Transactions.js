@@ -16,7 +16,7 @@ const Transactions=mongoose.Schema({
         type:String,
     },
     amount:{
-        type:Number,
+        type:Double,
         required:true,
     }
 },{timestamps:true});

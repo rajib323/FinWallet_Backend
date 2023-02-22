@@ -13,7 +13,7 @@ const Share=mongoose.Schema({
         required:true
     },
     price:{
-        type:Number,
+        type:Double,
         required:true,
         default:0
     }
