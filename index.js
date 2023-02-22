@@ -32,7 +32,7 @@ var conn=mongoose.connect(
 
 
 
-const { checkServer, addCredit,getAllBTCDATA, addDebit, delItem, getAllTrans,getAllCard,getAllShare, modifytrans}= require('./controller/controller');
+const { checkServer,modifyshare,addShare, addCredit,getAllBTCDATA, addDebit, delItem, getAllTrans,getAllCard,getAllShare, modifytrans, delshare}= require('./controller/controller');
 const {getMonthData,sharevalueupdate,addCard,delCard,addSharetoWatch, getBTCDATA, saveLiveData } = require('./controller/controller');
 
 
@@ -57,10 +57,10 @@ router.get('/getallcard',getAllCard);
 
 //share
 router.post('/addsharetowatch',addSharetoWatch);
-router.post('/getallshare',getAllShare);
-router.post('/addShare',(req,res)=>{});
-router.post('/modifyshare',(req,res)=>{});
-router.post('/delShare',(req,res)=>{});
+router.get('/getallshare',getAllShare);
+router.post('/addShare',addShare);
+router.put('/modifyshare',modifyshare);
+router.delete('/delShare',delshare);
 
 
 //bitcoin

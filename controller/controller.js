@@ -19,7 +19,8 @@ exports.addCredit=(req,res)=>{
     },(err,usr)=>{
         if(usr){
             return res.status(200).json({
-                "message":"Added Successfully"
+                "message":"Added Successfully",
+                'data':usr
             });
         }
         return res.status(404).json({"message":err});
@@ -36,7 +37,8 @@ exports.addDebit=(req,res)=>{
     },(err,usr)=>{
         if(usr){
             return res.status(200).json({
-                "message":"Added Successfully"
+                "message":"Added Successfully",
+                'data':usr
             });
         }
         return res.status(404).json({"message":err});
@@ -53,7 +55,8 @@ exports.modifytrans=(req,res)=>{
     },(err,usr)=>{
         if(usr){
             return res.status(200).json({
-                "message":"Updated Successfully"
+                "message":"Updated Successfully",
+                'data':usr
             });
         }
         return res.status(404).json({"message":err});
@@ -126,7 +129,7 @@ exports.addCard=(req,res)=>{
         if(err){
             return res.status(404).json({"message":err});
         }
-        return res.status(200).json({"message":'Card added'});
+        return res.status(200).json({"message":'Card added','data':usr});
     });
 }
 
@@ -142,13 +145,6 @@ exports.delCard=(req,res)=>{
 }
 exports.getAllCard=(req,res)=>{
     Cards.find({userId:req.query.userId},(err,usr)=>{
-        return res.status(200).json({
-            "data":usr
-        })
-    });
-}
-exports.getAllShare=(req,res)=>{
-    Share.find({userId:req.body.userId},(err,usr)=>{
         return res.status(200).json({
             "data":usr
         })
@@ -192,38 +188,106 @@ exports.sharevalueupdate=(req,res)=>{
     console.log(`--------------------------------`)
     ShareList.find({},(err,usr)=>{
         if(usr){
-        var usrmap={}
-        usr.forEach(async function(user) {
-            try{
-                const url = `https://www.google.com/search?q=${user.uin}+share+price`;
-            
-                const { data } = await axios.get(url);
-                const dom = new JSDOM(data);
-
-
-
-                var d=dom.window.document.querySelector('.BNeawe .iBp4i').textContent.replace(',','').split(' ')
+            usr.forEach(async function(user) {
+                try{
+                    const url = `https://www.google.com/search?q=${user.uin}+share+price`;
                 
-                console.log(`${user.uin}  ${d[0]}`)
-                
+                    const { data } = await axios.get(url);
+                    const dom = new JSDOM(data);
 
-                ShareList.updateOne({uin:user.uin},{price:parseFloat(d[0])},{returnOriginal:false},(err,usr)=>{
-                    if(err){
-                        return res.status(404).json({"message":err});
-                    }
-                })
-            }catch (err){
-                if(err)
-                return res.status(404).json({"message":err});
-            }
-        });
-        
+
+
+                    var d=dom.window.document.querySelector('.BNeawe .iBp4i').textContent.replace(',','').split(' ')
+                    
+                    console.log(`${user.uin}  ${d[0]}`)
+                    
+
+                    ShareList.updateOne({uin:user.uin},{price:parseFloat(d[0])},{returnOriginal:false},(err,usr)=>{
+                        if(err){
+                            return res.status(404).json({"message":err});
+                        }
+                    })
+                }catch (err){
+                    if(err)
+                    return res.status(404).json({"message":err});
+                }
+            });
+            console.log(`--------------------------------`)
+            res.status(200).json({"message":"updated"});
         
         }
-        console.log(`--------------------------------`)
-        return res.status(200).json({"message":"updated"});
+        
+        
     })
     
+}
+exports.addShare=(req,res)=>{
+    Share.findOne({$and: [{userid:req.body.userId},
+                            {uin:req.body.uin}]},(err,user)=>{
+
+        if(user)
+            return res.status(404).json({"message":'Already added'});
+
+        if(user==null) {
+            Share.create({
+                userid:req.body.userId,
+                uin:req.body.uin,
+                quantity:req.body.quantity,
+                price:req.body.price!=null?req.body.price:0
+            },(err,usr)=>{
+                if(err){
+                    return res.status(404).json({"message":err});
+                }
+                return res.status(200).json({"message":'Share added','data':usr});
+            })  
+        }
+
+        
+    })
+}
+exports.modifyshare=(req,res)=>{
+    console.log(req.body)
+    Share.findOne({$and: [{userid:req.body.userId},
+        {uin:req.body.uin}]},(err,usr)=>{
+        if(usr){
+
+            Share.findByIdAndUpdate(usr._id,{
+                quantity:req.body.quantity
+            },(err,usr)=>{
+                if(usr){
+                    return res.status(200).json({
+                        "message":"Updated Successfully",
+                        'data':usr
+                    });
+                }
+                return res.status(404).json({
+                    "message":err
+                });
+            })
+            
+        }
+        if(usr==null){
+            return res.status(404).json({
+                "message":"Does not exist"
+            });
+        }
+    })
+}
+exports.delshare=(req,res)=>{
+    console.log(req.body)
+    Share.deleteOne({_id:req.body.id},(err,usr)=>{
+        if(err){
+            return res.status(404).json({"message":'error'});
+        }
+        return res.status(200).json({"message":'done'});
+    })
+}
+exports.getAllShare=(req,res)=>{
+    Share.find({userid:req.query.userId},(err,usr)=>{
+        return res.status(200).json({
+            "data":usr
+        })
+    });
 }
 
 
