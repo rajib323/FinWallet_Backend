@@ -78,8 +78,8 @@ exports.getAllTrans=(req,res)=>{
             return res.status(404).json({"message":err});
         }
         if(usr){
-            var inc=0;
-            var exp=0;
+            var inc=0.0;
+            var exp=0.0;
             usr.forEach((user)=>{
                 if(user.type=='C')
                     inc+=user.amount
