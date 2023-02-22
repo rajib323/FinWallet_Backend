@@ -1,4 +1,5 @@
-const { default: mongoose } = require("mongoose");
+const { default: mongoose } = require("mongoose")
+const Double = require('@mongoosejs/double');
 const ShareList=mongoose.Schema({
     uin:{
         type:String,

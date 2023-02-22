@@ -1,4 +1,7 @@
-const { default: mongoose } = require("mongoose");
+const { default: mongoose} = require("mongoose")
+const Double = require('@mongoosejs/double');
+
+
 const Transactions=mongoose.Schema({
     userId:{
         type:String,
@@ -16,7 +19,7 @@ const Transactions=mongoose.Schema({
         type:String,
     },
     amount:{
-        type:Double,
+        type: Double,
         required:true,
     }
 },{timestamps:true});

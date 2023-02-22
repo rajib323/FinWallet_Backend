@@ -1,4 +1,5 @@
-const { default: mongoose } = require("mongoose");
+const { default: mongoose } = require("mongoose")
+const Double = require('@mongoosejs/double');
 const Cards=mongoose.Schema({
     userId:{
         type:String,

@@ -1,4 +1,5 @@
-const { default: mongoose } = require("mongoose");
+const { default: mongoose } = require("mongoose")
+const Double = require('@mongoosejs/double');
 const BitCoin=mongoose.Schema({
     symbol:{
         type:String,

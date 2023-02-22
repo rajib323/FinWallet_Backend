@@ -15,7 +15,7 @@ exports.addCredit=(req,res)=>{
         type:"C",
         category:req.body.category,
         description:req.body.desc,
-        amount:parseInt(req.body.amount)
+        amount:req.body.amount
     },(err,usr)=>{
         if(usr){
             return res.status(200).json({
@@ -33,7 +33,7 @@ exports.addDebit=(req,res)=>{
         type:"D",
         category:req.body.category,
         description:req.body.desc,
-        amount:parseInt(req.body.amount)
+        amount:req.body.amount
     },(err,usr)=>{
         if(usr){
             return res.status(200).json({
@@ -51,7 +51,7 @@ exports.modifytrans=(req,res)=>{
         type:req.body.type,
         category:req.body.category,
         description:req.body.desc,
-        amount:parseInt(req.body.amount)
+        amount:req.body.amount
     },(err,usr)=>{
         if(usr){
             return res.status(200).json({
@@ -81,13 +81,11 @@ exports.getAllTrans=(req,res)=>{
             var inc=0;
             var exp=0;
             usr.forEach((user)=>{
-                console.log(user.type)
                 if(user.type=='C')
                     inc+=user.amount
                 else
                     exp+=user.amount
             })
-            console.log(exp)
             return res.status(200).json({
                 'income':inc,
                 'expense':exp,
@@ -138,7 +136,7 @@ exports.addCard=(req,res)=>{
         validmonth:req.body.validmonth==null?0:req.body.validmonth,
         validyr:req.body.validyr==null?0:req.body.validyr,
         cvv:req.body.cvv==null?0:req.body.cvv,
-        amount:parseInt(req.body.amount==null?0:req.body.amount)
+        amount:req.body.amount==null?0.0:req.body.amount
         
     },(err,usr)=>{
         if(err){
