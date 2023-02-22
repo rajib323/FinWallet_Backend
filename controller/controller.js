@@ -77,9 +77,24 @@ exports.getAllTrans=(req,res)=>{
         if(err){
             return res.status(404).json({"message":err});
         }
-        return res.status(200).json({
-            "data":usr
-        })
+        if(usr){
+            var inc=0;
+            var exp=0;
+            usr.forEach((user)=>{
+                console.log(user.type)
+                if(user.type=='C')
+                    inc+=user.amount
+                else
+                    exp+=user.amount
+            })
+            console.log(exp)
+            return res.status(200).json({
+                'income':inc,
+                'expense':exp,
+                "data":usr
+            })
+
+        }
     });
 }
 exports.getMonthData=(req,res)=>{
