@@ -80,32 +80,86 @@ exports.getAllTrans=(req,res)=>{
         if(usr){
             var inc=0.0;
             var exp=0.0;
+            var prevBalance=0.0;
+            const curremtDate=new Date(Date.now());
+            var datalist=[];
+            var categSpending=new Map()
+            var ctkeys=[]
+
+
+            //heatmap daymap
             usr.forEach((user)=>{
-                if(user.type=='C')
-                    inc+=user.amount
-                else
-                    exp+=user.amount
+
+                var dt=new Date(user.createdAt)
+
+                if(dt.getMonth()==curremtDate.getMonth()&&dt.getFullYear()==curremtDate.getFullYear()){
+                    datalist.push(user);
+                    //categ analysis
+                    if(categSpending[user.category]==null){
+                        categSpending[user.category]=user.amount
+                        ctkeys.push(user.category)
+                    }
+                    else{
+                        categSpending[user.category]+=user.amount
+                    }
+
+
+                    //inc exp analysis
+                    if(user.type=='C')
+                        inc+=user.amount
+                    else
+                        exp+=user.amount
+                }
+                else{
+                    if(user.type=='C')
+                        prevBalance+=user.amount
+                    else
+                        prevBalance-=user.amount
+                }
+
+                
             })
+
+            var finalcategSpending=[]
+
+            ctkeys.forEach((e)=>{
+                finalcategSpending.push({
+                    'category':e,
+                    'amount':categSpending[e]
+                })
+            })
+
+
             return res.status(200).json({
                 'income':inc,
                 'expense':exp,
-                "data":usr
+                'categList':ctkeys,
+                'categSpending':finalcategSpending,
+                'balance':prevBalance+inc-exp,
+                "data":datalist
             })
 
         }
     });
 }
-exports.getMonthData=(req,res)=>{
 
+exports.analysis=(req,res)=>{
+    //console.log(req.query.userId)
     const monthNames = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
     ];
-    body={}
+    var days=['Sunday','Monday','Tuesday','Thursday','Friday','Saturday']
+    var data=[]
+    var monthly=[]
+    var yearly=[]
+    var body=new Map()
     Transactions.find({userId:req.query.userId},(err,usr)=>{
         if(usr){
             usr.forEach((user)=>{
                 const date=new Date(user.createdAt)
+                //console.log(`${monthNames[date.getMonth()]} ${date.getFullYear()}`)
                 if(body[`${monthNames[date.getMonth()]} ${date.getFullYear()}`]==null){
+                    data.push(`${monthNames[date.getMonth()]} ${date.getFullYear()}`)
                     body[`${monthNames[date.getMonth()]} ${date.getFullYear()}`]=[user]
                 }
                 else{
@@ -113,9 +167,187 @@ exports.getMonthData=(req,res)=>{
                 }
                 
             })
-    
+
+
+            var prevBalance=0.0
+            data.reverse().forEach((e)=>{
+                var inc=0.0;
+                var exp=0.0;
+                var categSpending=new Map()
+                var ctkeys=[]
+                
+                var dayheatmap=[0,0,0,0,0,0,0]
+                var timeamount={}
+                var timekeys=[]
+
+
+                body[e].forEach((e)=>{
+                    const date=new Date(e.createdAt)
+                    //dayheatmap
+                    dayheatmap[date.getDay()]+=1
+
+                    //timeheatmap
+                    if(timeamount[`${date.getHours()}:${date.getMinutes()}`]==null){
+                        timeamount[`${date.getHours()}:${date.getMinutes()}`]=e.amount
+                        timekeys.push(`${date.getHours()}:${date.getMinutes()}`)
+                    }
+                    else{
+                        timeamount[`${date.getHours()}:${date.getMinutes()}`]+=e.amount
+                    }
+
+                    //category
+                    if(categSpending[e.category]==null){
+                        categSpending[e.category]=e.amount
+                        ctkeys.push(e.category)
+                    }
+                    else{
+                        categSpending[e.category]+=e.amount
+                    }
+
+                    //type
+                    if(e.type=='C')
+                        inc+=e.amount
+                    else
+                        exp+=e.amount
+                })
+
+
+                var finalcategSpending=[]
+
+                ctkeys.forEach((e)=>{
+                    finalcategSpending.push({
+                        'category':e,
+                        'amount':categSpending[e]
+                    })
+                })
+
+                var finaltimeHeatmap=[]
+                timekeys.forEach((e)=>{
+                    finaltimeHeatmap.push({
+                        'time':e,
+                        'amount':timeamount[e]
+                    })
+                })
+                
+                for(i=0;i<6;i++){
+                    var d=dayheatmap[i]
+                    dayheatmap[i]={
+                        'day':days[i],
+                        'count':d
+                    }
+                }
+
+
+                prevBalance+=inc-exp;
+
+                var dt={
+                    'month':e.split(' ')[0],
+                    'year':e.split(' ')[1],
+                    'categSpending':finalcategSpending,
+                    'dayheatmap':dayheatmap,
+                    'timeheatmap':finaltimeHeatmap,
+                    'income':inc,
+                    'expense':exp,
+                    'currBalance':prevBalance,
+                }
+                monthly.push(dt)
+                
+            })
+
+
             return res.status(200).json({
-                'data':body
+                'listofmonth':data.reverse(),
+                'monthly':monthly
+            })
+        }
+        return res.status(404).json({
+            'data':err
+        })
+    });
+}
+
+
+
+
+
+exports.getMonthData=(req,res)=>{
+    //console.log(req.query.userId)
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+    ];
+    var data=[]
+    var finalData=[]
+    var body=new Map()
+    Transactions.find({userId:req.query.userId},(err,usr)=>{
+        if(usr){
+            usr.forEach((user)=>{
+                const date=new Date(user.createdAt)
+                //console.log(`${monthNames[date.getMonth()]} ${date.getFullYear()}`)
+                if(body[`${monthNames[date.getMonth()]} ${date.getFullYear()}`]==null){
+                    data.push(`${monthNames[date.getMonth()]} ${date.getFullYear()}`)
+                    body[`${monthNames[date.getMonth()]} ${date.getFullYear()}`]=[user]
+                }
+                else{
+                    body[`${monthNames[date.getMonth()]} ${date.getFullYear()}`].push(user)
+                }
+                
+            })
+
+
+            var prevBalance=0.0
+            data.reverse().forEach((e)=>{
+                var inc=0.0;
+                var exp=0.0;
+                var categSpending=new Map()
+                var ctkeys=[]
+
+                body[e].forEach((e)=>{
+
+                    if(categSpending[e.category]==null){
+                        categSpending[e.category]=e.amount
+                        ctkeys.push(e.category)
+                    }
+                    else{
+                        categSpending[e.category]+=e.amount
+                    }
+
+                    if(e.type=='C')
+                        inc+=e.amount
+                    else
+                        exp+=e.amount
+                })
+
+
+                var finalcategSpending=[]
+
+                ctkeys.forEach((e)=>{
+                    finalcategSpending.push({
+                        'category':e,
+                        'amount':categSpending[e]
+                    })
+                })
+
+
+
+                prevBalance+=inc-exp;
+
+                var dt={
+                    'month':e.split(' ')[0],
+                    'year':e.split(' ')[1],
+                    'categSpending':finalcategSpending,
+                    'income':inc,
+                    'expense':exp,
+                    'currBalance':prevBalance,
+                    'data':body[e]
+                }
+                finalData.push(dt)
+                
+            })
+
+
+            return res.status(200).json({
+                'listofmonth':data,
+                'data':finalData
             })
         }
         return res.status(404).json({

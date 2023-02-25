@@ -32,7 +32,7 @@ var conn=mongoose.connect(
 
 
 
-const { checkServer,modifyshare,addShare, addCredit,getAllBTCDATA, addDebit, delItem, getAllTrans,getAllCard,getAllShare, modifytrans, delshare}= require('./controller/controller');
+const { checkServer,modifyshare,addShare, addCredit,getAllBTCDATA, addDebit, delItem, getAllTrans,getAllCard,getAllShare, modifytrans, delshare, analysis}= require('./controller/controller');
 const {getMonthData,sharevalueupdate,addCard,delCard,addSharetoWatch, getBTCDATA, saveLiveData } = require('./controller/controller');
 
 
@@ -48,6 +48,7 @@ router.put('/modifytrans',modifytrans);     //checked
 router.delete('/deltrans',delItem);           //checked
 router.get('/getalltrans',getAllTrans);    //checked
 router.get('/getmonthdata',getMonthData);  //checked
+router.get('/chartanalysis',analysis); 
 
 
 //card
