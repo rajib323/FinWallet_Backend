@@ -3,8 +3,7 @@ const Double = require('@mongoosejs/double');
 const ShareList=mongoose.Schema({
     uin:{
         type:String,
-        required:true,
-        unique:true
+        required:true
     },
     price:{
         type:Double,

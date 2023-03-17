@@ -29,11 +29,48 @@ var conn=mongoose.connect(
 })
 
 
+const axios = require("axios");
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
+
+//cronjob
+async function watchme(){
+    console.log(`--------------------------------`)
+    ShareList.find({},(err,usr)=>{
+      if(usr){
+        var usrmap={}
+        usr.forEach(async function(user) {
+          const url = `https://www.google.com/search?q=${user.uin}+share+price`;
+  
+          const { data } = await axios.get(url);
+          const dom = new JSDOM(data);
+  
+  
+  
+          var d=dom.window.document.querySelector('.BNeawe .iBp4i').textContent.replace(',','').split(' ')
+  
+          console.log(`${user.uin}  ${d[0]}`)
+  
+  
+          ShareList.create({uin:user.uin,price:parseFloat(d[0])},(err,usr)=>{})
+        });
+  
+  
+      }
+      console.log(`--------------------------------`)
+    })
+}
+
+
+const schedule = require("node-schedule");
+schedule.scheduleJob("*/5 9-15 * * *", watchme);
 
 
 
 const { checkServer,modifyshare,addShare, addCredit,getAllBTCDATA, addDebit, delItem, getAllTrans,getAllCard,getAllShare, modifytrans, delshare, analysis}= require('./controller/controller');
 const {getMonthData,sharevalueupdate,addCard,delCard,addSharetoWatch, getBTCDATA, saveLiveData } = require('./controller/controller');
+const ShareList = require("./model/ShareList");
+const BitCoin = require("./model/BitCoin");
 
 
 //router
