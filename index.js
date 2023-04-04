@@ -62,12 +62,28 @@ async function watchme(){
 }
 
 
+async function getfeed(){
+  console.log(`--------------------------------`)
+  console.log('Data fetched');
+  //780a9817c27042138d27cf450bef02ac
+  const data = await axios.get(
+    'https://newsapi.org/v2/top-headlines?country=in&apiKey=780a9817c27042138d27cf450bef02ac&pageSize=100',
+  {headers: {
+    "Content-Type":"application/json"
+  }})
+  console.log(data['data'])
+  fs.writeFile('./data/newsdata.json',JSON.stringify(data['data']),()=>{console.log('File Appended')});
+
+  console.log(`--------------------------------`)
+}
+
+
 const schedule = require("node-schedule");
 schedule.scheduleJob("*/5 9-15 * * *", watchme);
+schedule.scheduleJob("0 5,17 * * *", getfeed);
 
 
-
-const { checkServer,modifyshare,addShare, addCredit,getAllBTCDATA, addDebit, delItem, getAllTrans,getAllCard,getAllShare, modifytrans, delshare, analysis}= require('./controller/controller');
+const { getNews,modifyshare,addShare, addCredit,getAllBTCDATA, addDebit, delItem, getAllTrans,getAllCard,getAllShare, modifytrans, delshare, analysis}= require('./controller/controller');
 const {getMonthData,sharevalueupdate,addCard,delCard,addSharetoWatch, getBTCDATA, saveLiveData } = require('./controller/controller');
 const ShareList = require("./model/ShareList");
 const BitCoin = require("./model/BitCoin");
@@ -77,6 +93,9 @@ const BitCoin = require("./model/BitCoin");
 router.get('/',(req,res)=>{
     res.send('Hey Buddy working great')
 });
+
+//newsdata
+router.get('/getnews', getNews)
 
 //transactions
 router.post('/addcredit',addCredit);      //checked
@@ -106,7 +125,6 @@ router.post('/btcdata',getBTCDATA);
 router.get('/getallbtcdata',getAllBTCDATA);
 
 //cron data
-router.put('/updatesharevalue',sharevalueupdate);//* 9-15 * * *
 //router.put('/btclivedata',saveLiveData);//9-15 * * *
 
 

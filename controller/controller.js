@@ -7,6 +7,17 @@ const { JSDOM } = jsdom;
 const BitCoin=require('../model/BitCoin')
 const ShareList = require("../model/ShareList");
 
+
+const fs=require('fs')
+
+exports.getNews=(req,res)=>{
+    fs.readFile('./data/newsdata.json','utf-8',(err,data)=>{
+        
+        return res.status(200).json(JSON.parse(data));
+    });
+    
+
+}
 //Transactions
 exports.addCredit=(req,res)=>{
     console.log(req.body)
@@ -45,6 +56,7 @@ exports.addDebit=(req,res)=>{
     })
 }
 exports.modifytrans=(req,res)=>{
+    console.log('modifytrans')
     console.log(req.body)
     Transactions.findByIdAndUpdate({
         _id:req.body.id},{
@@ -338,7 +350,7 @@ exports.getMonthData=(req,res)=>{
                     'income':inc,
                     'expense':exp,
                     'currBalance':prevBalance,
-                    'data':body[e]
+                    'fulldata':body[e]
                 }
                 finalData.push(dt)
                 
@@ -347,7 +359,7 @@ exports.getMonthData=(req,res)=>{
 
             return res.status(200).json({
                 'listofmonth':data,
-                'data':finalData
+                'mondata':finalData
             })
         }
         return res.status(404).json({
