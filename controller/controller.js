@@ -160,10 +160,10 @@ exports.analysis=(req,res)=>{
     const monthNames = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
     ];
-    var days=['Sunday','Monday','Tuesday','Thursday','Friday','Saturday']
+    var days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
     var data=[]
     var monthly=[]
-    var yearly=[]
+    //var yearly=[]
     var body=new Map()
     Transactions.find({userId:req.query.userId},(err,usr)=>{
         if(usr){
@@ -223,7 +223,7 @@ exports.analysis=(req,res)=>{
                         exp+=e.amount
                 })
 
-
+                //console.log(dayheatmap)
                 var finalcategSpending=[]
 
                 ctkeys.forEach((e)=>{
@@ -241,7 +241,7 @@ exports.analysis=(req,res)=>{
                     })
                 })
                 
-                for(i=0;i<6;i++){
+                for(i=0;i<=6;i++){
                     var d=dayheatmap[i]
                     dayheatmap[i]={
                         'day':days[i],
@@ -441,43 +441,7 @@ exports.addSharetoWatch=async (req,res)=>{
           }
     }
 }
-exports.sharevalueupdate=(req,res)=>{
-    console.log(`--------------------------------`)
-    ShareList.find({},(err,usr)=>{
-        if(usr){
-            usr.forEach(async function(user) {
-                try{
-                    const url = `https://www.google.com/search?q=${user.uin}+share+price`;
-                
-                    const { data } = await axios.get(url);
-                    const dom = new JSDOM(data);
 
-
-
-                    var d=dom.window.document.querySelector('.BNeawe .iBp4i').textContent.replace(',','').split(' ')
-                    
-                    console.log(`${user.uin}  ${d[0]}`)
-                    
-
-                    ShareList.updateOne({uin:user.uin},{price:parseFloat(d[0])},{returnOriginal:false},(err,usr)=>{
-                        if(err){
-                            return res.status(404).json({"message":err});
-                        }
-                    })
-                }catch (err){
-                    if(err)
-                    return res.status(404).json({"message":err});
-                }
-            });
-            console.log(`--------------------------------`)
-            res.status(200).json({"message":"updated"});
-        
-        }
-        
-        
-    })
-    
-}
 exports.addShare=(req,res)=>{
     Share.findOne({$and: [{userid:req.body.userId},
                             {uin:req.body.uin}]},(err,user)=>{
@@ -538,6 +502,19 @@ exports.delshare=(req,res)=>{
         }
         return res.status(200).json({"message":'done'});
     })
+}
+exports.search=(req,res)=>{
+    ShareList.find({},(err,usr)=>{
+        //console.log(usr)
+        var data=[];
+        usr.forEach((e)=>{
+            data.push(e.uin)
+        })
+
+        return res.status(200).json({
+            "data":data
+        })
+    });
 }
 exports.getAllShare=(req,res)=>{
     Share.find({userid:req.query.userId},(err,usr)=>{

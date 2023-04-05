@@ -83,7 +83,7 @@ schedule.scheduleJob("*/5 9-15 * * *", watchme);
 schedule.scheduleJob("0 5,17 * * *", getfeed);
 
 
-const { getNews,modifyshare,addShare, addCredit,getAllBTCDATA, addDebit, delItem, getAllTrans,getAllCard,getAllShare, modifytrans, delshare, analysis}= require('./controller/controller');
+const { getNews,modifyshare,addShare, addCredit,getAllBTCDATA, addDebit, delItem, getAllTrans,getAllCard,getAllShare, modifytrans, delshare, analysis, search}= require('./controller/controller');
 const {getMonthData,sharevalueupdate,addCard,delCard,addSharetoWatch, getBTCDATA, saveLiveData } = require('./controller/controller');
 const ShareList = require("./model/ShareList");
 const BitCoin = require("./model/BitCoin");
@@ -115,6 +115,7 @@ router.get('/getallcard',getAllCard);
 //share
 router.post('/addsharetowatch',addSharetoWatch);
 router.get('/getallshare',getAllShare);
+router.get('/search',search);
 router.post('/addShare',addShare);
 router.put('/modifyshare',modifyshare);
 router.delete('/delShare',delshare);
