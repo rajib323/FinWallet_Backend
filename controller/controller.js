@@ -582,9 +582,79 @@ exports.saveLiveData=async (req,resp)=>{
 }
 
 
+const ToDoList=require('../model/ToDoLIst')
+
+exports.gettodo=(req,res)=>{
+    ToDoList.find({userId:req.query.userId},(err,usr)=>{
 
 
+        var cst=new Map();
+        usr.forEach((e)=>{
+            
+            if(cst.has(e.date.substring(0,11))){
+                cst.set(e.date.substring(0,11),cst.get(e.date.substring(0,11))+1)
+            }
+            else{
+                cst.set(e.date.substring(0,11),1);
+            }
+                
+        })
+        var baaler=[ ...cst.keys() ];
+        var dt=[]
+        baaler.forEach((e)=>{
+            dt.push({
+                "date":e,
+                "freq":cst.get(e)
+            })
+        })
 
+        
 
+        if(usr){
+            return res.status(200).json({
+                "calendar":dt,
+                "data":usr});
+        }
+        return res.status(200).json({"message":err});
+    })
+}
 
+exports.addtodo=(req,res)=>{
+    ToDoList.create({
+        userId:req.body.userId,
+        text:req.body.text,
+        date:req.body.date==null?DateTime.now():req.body.date,
+        progress:0.0
+    },(err,usr)=>{
+        if(usr){
+            return res.status(200).json({"message":"done","data":usr});
+        }
+        return res.status(200).json({"message":err});
+    })
+}
+
+exports.completedToDo=(req,res)=>{
+    ToDoList.findByIdAndUpdate({_id:req.query.id},{progress:100.0,isDone:true},(err,usr)=>{
+        if(usr){
+            return res.status(200).json({"message":"done"});
+        }
+        return res.status(200).json({"message":err});
+    })
+}
+
+exports.updateToDo=(req,res)=>{
+    console.log(req.body)
+    ToDoList.findByIdAndUpdate({_id:req.body.id},{
+        userId:req.body.userId,
+        text:req.body.text,
+        date:req.body.date==null?DateTime.now():req.body.date,
+        isDone:req.body.progress==100?true:false,
+        progress:req.body.progress
+    },(err,usr)=>{
+        if(usr){
+            return res.status(200).json({"message":'updated'});
+        }
+        return res.status(200).json({"message":err});
+    })
+}
 

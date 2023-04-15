@@ -3,7 +3,7 @@ const mongoose = require("mongoose")
 const cors = require("cors");
 const env = require("dotenv");
 const router = require("express").Router();
-
+const fs=require('fs')
 
 
 env.config();
@@ -83,7 +83,7 @@ schedule.scheduleJob("*/5 9-15 * * *", watchme);
 schedule.scheduleJob("0 5,17 * * *", getfeed);
 
 
-const { getNews,modifyshare,addShare, addCredit,getAllBTCDATA, addDebit, delItem, getAllTrans,getAllCard,getAllShare, modifytrans, delshare, analysis, search}= require('./controller/controller');
+const { getNews,modifyshare,addShare, addCredit,getAllBTCDATA, addDebit, delItem, getAllTrans,getAllCard,getAllShare, modifytrans, delshare, analysis, search, updateToDo, completedToDo, addtodo, gettodo}= require('./controller/controller');
 const {getMonthData,sharevalueupdate,addCard,delCard,addSharetoWatch, getBTCDATA, saveLiveData } = require('./controller/controller');
 const ShareList = require("./model/ShareList");
 const BitCoin = require("./model/BitCoin");
@@ -93,6 +93,14 @@ const BitCoin = require("./model/BitCoin");
 router.get('/',(req,res)=>{
     res.send('Hey Buddy working great')
 });
+
+//todo list
+router.get('/gettodo', gettodo)
+router.post('/addtodo', addtodo)
+router.get('/completed', completedToDo)
+router.put('/updatetodo', updateToDo)
+
+
 
 //newsdata
 router.get('/getnews', getNews)
