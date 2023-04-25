@@ -83,7 +83,7 @@ schedule.scheduleJob("*/5 9-15 * * *", watchme);
 schedule.scheduleJob("0 5,17 * * *", getfeed);
 
 
-const { getNews,modifyshare,addShare, addCredit,getAllBTCDATA, addDebit, delItem, getAllTrans,getAllCard,getAllShare, modifytrans, delshare, analysis, search, updateToDo, completedToDo, addtodo, gettodo}= require('./controller/controller');
+const { getNews,modifyshare,addShare, addCredit,getAllBTCDATA, addDebit, delItem, getAllTrans,getAllCard,getAllShare, modifytrans, delshare, analysis, search, updateToDo, completedToDo, addtodo, gettodo, login}= require('./controller/controller');
 const {getMonthData,sharevalueupdate,addCard,delCard,addSharetoWatch, getBTCDATA, saveLiveData } = require('./controller/controller');
 const ShareList = require("./model/ShareList");
 const BitCoin = require("./model/BitCoin");
@@ -93,7 +93,7 @@ const BitCoin = require("./model/BitCoin");
 router.get('/',(req,res)=>{
     res.send('Hey Buddy working great')
 });
-
+router.post('/login', login)
 //todo list
 router.get('/gettodo', gettodo)
 router.post('/addtodo', addtodo)

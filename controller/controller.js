@@ -658,3 +658,44 @@ exports.updateToDo=(req,res)=>{
     })
 }
 
+const userModel=require('../model/UserModel')
+exports.login=(req,res)=>{
+    console.log(req.body);
+    userModel.findOne({email:req.body.email},(err,usr)=>{
+        //console.log(err)
+        //console.log(usr)
+        if(err==null&&usr==null){
+            let newUser=userModel()
+            newUser.email = req.body.email,
+            newUser.password=newUser.setPassword(req.body.password);
+            newUser.save((err, User) => {
+                if (err) {
+                    return res.status(400).send({
+                        message: "Failed to add user.",
+                        error:err
+                    });
+                }
+                if(User) {
+                    return res.status(200).send({
+                        message: "User added successfully.",
+                        data:User
+                    });
+                }
+            });
+        }
+        if(usr){
+            if (usr.validPassword(req.body.password,usr.password)) {
+                return res.status(200).send({
+                    message: "User Logged In",
+                    data:usr
+                })
+            }
+            else {
+                return res.status(400).send({
+                    message: "Wrong Password"
+                    
+                });
+            }
+        }
+    });
+}
