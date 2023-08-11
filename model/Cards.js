@@ -31,10 +31,6 @@ const Cards=mongoose.Schema({
         type:String,
         required:true,
         default:0
-    },
-    amount:{
-        type:Double,
-        default:0
     }
 },{timestamps:true});
 

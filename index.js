@@ -52,7 +52,9 @@ async function watchme(){
           console.log(`${user.uin}  ${d[0]}`)
   
   
-          ShareList.create({uin:user.uin,price:parseFloat(d[0])},(err,usr)=>{})
+          Share.updateMany({uin:user.uin},{newprice:parseFloat(d[0])},(err,usr)=>{
+            console.log(err,usr);
+          });
         });
   
   
@@ -80,13 +82,14 @@ async function getfeed(){
 
 const schedule = require("node-schedule");
 schedule.scheduleJob("*/5 9-15 * * *", watchme);
-schedule.scheduleJob("0 5,17 * * *", getfeed);
+schedule.scheduleJob("0 0,5,10,15,20 * * *", getfeed);
 
 
 const { getNews,modifyshare,addShare, addCredit,getAllBTCDATA, addDebit, delItem, getAllTrans,getAllCard,getAllShare, modifytrans, delshare, analysis, search, updateToDo, completedToDo, addtodo, gettodo, login}= require('./controller/controller');
-const {getMonthData,sharevalueupdate,addCard,delCard,addSharetoWatch, getBTCDATA, saveLiveData } = require('./controller/controller');
+const {getMonthData,sharevalueupdate,addCard,delCard, getBTCDATA, saveLiveData } = require('./controller/controller');
 const ShareList = require("./model/ShareList");
-const BitCoin = require("./model/BitCoin");
+const Share = require("./model/Share");
+
 
 
 //router
@@ -95,7 +98,7 @@ router.get('/',(req,res)=>{
 });
 router.post('/login', login)
 //todo list
-router.get('/gettodo', gettodo)
+router.get('/gettodo', gettodo)////////////////////
 router.post('/addtodo', addtodo)
 router.get('/completed', completedToDo)
 router.put('/updatetodo', updateToDo)
@@ -110,7 +113,7 @@ router.post('/addcredit',addCredit);      //checked
 router.post('/adddebit',addDebit);      //checked
 router.put('/modifytrans',modifytrans);     //checked
 router.delete('/deltrans',delItem);           //checked
-router.get('/getalltrans',getAllTrans);    //checked
+router.get('/getalltrans',getAllTrans);    //checked//////////////////
 router.get('/getmonthdata',getMonthData);  //checked
 router.get('/chartanalysis',analysis); 
 
@@ -118,11 +121,10 @@ router.get('/chartanalysis',analysis);
 //card
 router.post('/verify',addCard);     
 router.delete('/delcard',delCard);
-router.get('/getallcard',getAllCard);
+router.get('/getallcard',getAllCard);////////////
 
 //share
-router.post('/addsharetowatch',addSharetoWatch);
-router.get('/getallshare',getAllShare);
+router.get('/getallshare',getAllShare);////////
 router.get('/search',search);
 router.post('/addShare',addShare);
 router.put('/modifyshare',modifyshare);

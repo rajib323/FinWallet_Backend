@@ -410,37 +410,6 @@ exports.getAllCard=(req,res)=>{
 
 
 //share
-exports.addSharetoWatch=async (req,res)=>{
-    const axios = require("axios");
-    const url = `https://www.google.com/search?q=${req.body.uin}+share+price`;
-    const jsdom = require("jsdom");
-    
-    const { JSDOM } = jsdom;
-    try {
-      const { data } = await axios.get(url);
-      const dom = new JSDOM(data);
-      const d=dom.window.document.querySelector('.BNeawe .iBp4i').textContent.replace(',','').split(' ')
-
-      
-      ShareList.create({uin:req.body.uin,price:parseFloat(d[0])},(err,usr)=>{
-        if(usr){
-            console.log(`--------------------------------`)
-            console.log(`New added : ${req.body.uin}  ${parseFloat(d[0])}`)
-            console.log(`--------------------------------`)
-            return res.status(200).json({'message':'added'});
-        }
-        if(err){
-            return res.status(404).json({'message':err});
-        }
-      })
-
-    }  catch (err) {
-        if (e instanceof TypeError) {
-            // statements to handle TypeError exceptions
-            return res.status(404).json({'message':'error'});
-          }
-    }
-}
 
 exports.addShare=(req,res)=>{
     Share.findOne({$and: [{userid:req.body.userId},
@@ -454,11 +423,16 @@ exports.addShare=(req,res)=>{
                 userid:req.body.userId,
                 uin:req.body.uin,
                 quantity:req.body.quantity,
-                price:req.body.price!=null?req.body.price:0
+                newprice:req.body.price!=null?req.body.price:0,
+                oldprice:req.body.price!=null?req.body.price:0
             },(err,usr)=>{
                 if(err){
                     return res.status(404).json({"message":err});
                 }
+
+
+                ShareList.create({uin: req.body.uin});
+
                 return res.status(200).json({"message":'Share added','data':usr});
             })  
         }

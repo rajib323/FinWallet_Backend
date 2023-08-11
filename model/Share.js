@@ -13,7 +13,12 @@ const Share=mongoose.Schema({
         type:Number,
         required:true
     },
-    price:{
+    oldprice:{
+        type:Double,
+        required:true,
+        default:0
+    },
+    newprice:{
         type:Double,
         required:true,
         default:0
